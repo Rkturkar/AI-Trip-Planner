@@ -6,7 +6,7 @@
         updated history sidebar with transport info
 ═══════════════════════════════════════════════ */
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://ai-trip-planner-latest.onrender.com';
 
 /* ── Destinations ── */
 const DESTINATIONS = [
