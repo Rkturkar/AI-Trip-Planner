@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WanderAI — AI-Powered Trip Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="user.css"/>
+</head>
+<body>
+
+<!-- ── LOADER ── -->
+<div id="loader">
+  <div class="loader-sky" id="loaderSky"></div>
+  <div class="flight-track">
+    <div class="dashed-path"></div>
+    <div class="contrail"></div>
+    <div class="plane">
+      <svg viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="10,45 75,20 62,45 75,70" fill="#ffffff" opacity=".95"/>
+        <polygon points="62,45 75,20 80,45" fill="#ff6b1a"  opacity=".9"/>
+        <polygon points="62,45 75,70 80,45" fill="#cc5511"  opacity=".8"/>
+        <polygon points="25,45 62,35 58,45 62,55" fill="#f0f0f0" opacity=".8"/>
+        <polygon points="10,45 18,30 30,42" fill="#ff8c42"  opacity=".9"/>
+      </svg>
+    </div>
+  </div>
+  <div class="loader-brand">WanderAI<span>✈</span></div>
+  <div class="loader-sub">CRAFTING YOUR PERFECT JOURNEY</div>
+</div>
+
+<!-- ── APP SHELL ── -->
+<div class="app-shell" id="appShell">
+
+  <!-- ════════════════ SIDEBAR ════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">WANDER<span>AI</span></div>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+    </div>
+
+    <button class="new-trip-btn" onclick="startNewTrip()">
+      <span class="new-trip-icon">+</span> New Trip Plan
+    </button>
+
+    <div class="history-section">
+      <div class="history-label">Recent Trips</div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty" id="historyEmpty">
+          <div class="history-empty-icon">🗺️</div>
+          <div>No trips planned yet.<br/>Start your first adventure!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-note">Powered by LangGraph · Groq · Tavily</div>
+      <div class="sidebar-footer-note">Built by Ritik Turkar</div>
+    </div>
+  </aside>
+
+  <!-- ════════════════ MAIN CONTENT ════════════════ -->
+  <div class="main-content" id="mainContent">
+
+    <!-- ── NAVBAR ── -->
+    <nav id="navbar">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle history sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-logo" onclick="scrollToTop()">WANDER<span>AI</span></div>
+      <div class="nav-links" id="navLinks">
+        <a href="#destinations" onclick="closeMenu()">Destinations</a>
+        <a href="#planner"      onclick="closeMenu()">Plan Trip</a>
+        <a href="#features"     onclick="closeMenu()">Features</a>
+      </div>
+      <div class="nav-right">
+        <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+        <button class="nav-cta" onclick="scrollToPlanner()">PLAN NOW</button>
+      </div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <section class="hero" id="home">
+      <div class="hero-bg"></div>
+      <div class="hero-grid-lines"></div>
+
+      <div class="hero-content">
+        <h1>Your Next Trip,<br/><em>Perfectly Planned</em></h1>
+        <p>Tell us where you want to go — WanderAI builds your complete itinerary with flights, hotels, activities, and a budget breakdown in seconds.</p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="scrollToPlanner()">Plan My Trip →</button>
+          <button class="btn-ghost" onclick="document.getElementById('destinations').scrollIntoView({behavior:'smooth'})">Explore Destinations</button>
+        </div>
+        <div class="hero-stats">
+          <div><div class="stat-val">50<span>+</span></div><div class="stat-lbl">Destinations</div></div>
+          <div><div class="stat-val">AI<span>×</span>8</div><div class="stat-lbl">Specialised Agents</div></div>
+          <div><div class="stat-val">10<span>s</span></div><div class="stat-lbl">Average Plan Time</div></div>
+        </div>
+      </div>
+
+      <div class="hero-carousel-wrap">
+        <div class="carousel-frame">
+          <div class="carousel-progress-bar" id="carouselProgressBar"></div>
+          <div class="carousel-counter" id="carouselCounter">1 / 5</div>
+          <div class="carousel-track" id="carouselTrack">
+            <div class="carousel-slide active">
+              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80" alt="Himalayan mountain peaks" loading="eager"/>
+              <div class="slide-caption"><span class="slide-tag">Mountain</span><div class="slide-title">Himalayan Heights</div><div class="slide-sub">Manali · Himachal Pradesh</div></div>
+            </div>
+            <div class="carousel-slide">
+              <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80" alt="Snow-covered Kashmir peaks" loading="lazy"/>
+              <div class="slide-caption"><span class="slide-tag">Snow</span><div class="slide-title">Winter Wonderland</div><div class="slide-sub">Kashmir · Gulmarg</div></div>
+            </div>
+            <div class="carousel-slide">
+              <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80" alt="Motorbike on mountain road" loading="lazy"/>
+              <div class="slide-caption"><span class="slide-tag">Bike Trip</span><div class="slide-title">Rohtang Pass Ride</div><div class="slide-sub">Leh-Ladakh Highway</div></div>
+            </div>
+            <div class="carousel-slide">
+              <img src="https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=80" alt="Green mountain valley" loading="lazy"/>
+              <div class="slide-caption"><span class="slide-tag">Trek</span><div class="slide-title">Valley of Flowers</div><div class="slide-sub">Uttarakhand · India</div></div>
+            </div>
+            <div class="carousel-slide">
+              <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=900&q=80" alt="Lakeside camping" loading="lazy"/>
+              <div class="slide-caption"><span class="slide-tag">Camping</span><div class="slide-title">Lakeside Camps</div><div class="slide-sub">Spiti Valley · HP</div></div>
+            </div>
+          </div>
+          <button class="carousel-btn carousel-prev" id="carouselPrev" aria-label="Previous slide">&#8249;</button>
+          <button class="carousel-btn carousel-next" id="carouselNext" aria-label="Next slide">&#8250;</button>
+          <div class="carousel-dots" id="carouselDots"></div>
+        </div>
+        <div class="carousel-badge">
+          <div class="badge-icon">🏔️</div>
+          <div><div class="badge-val">200+</div><div class="badge-lbl">Adventures Planned</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DESTINATIONS ── -->
+    <section class="dest-section" id="destinations">
+      <div class="section-header">
+        <div>
+          <div class="section-eyebrow">Popular Picks</div>
+          <div class="section-title">Trending Destinations</div>
+        </div>
+        <div class="see-all" onclick="scrollToPlanner()">Explore all →</div>
+      </div>
+      <div class="dest-grid" id="destGrid"></div>
+    </section>
+
+    <!-- ── PLANNER ── -->
+    <section id="planner">
+      <div class="planner-wrap">
+        <div style="text-align:center;margin-bottom:40px">
+          <div class="section-eyebrow">AI Trip Planner</div>
+          <div class="section-title">Build Your Dream Trip</div>
+          <p style="color:var(--muted);font-size:15px;margin-top:12px">
+            Describe your ideal trip and our AI handles everything — flights, hotels, itineraries, and budgets.
+          </p>
+        </div>
+        <div class="planner-box">
+
+          <!-- Row 1: Start + Destination -->
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">📍</span> Starting From
+              </label>
+              <input class="trip-input" id="inputStart" type="text"
+                     placeholder="e.g. Hyderabad, Mumbai, Delhi…"
+                     oninput="detectStartLocation(this.value)"/>
+              <div class="location-detect-row">
+                <button class="detect-location-btn" onclick="detectMyLocation()" title="Use my current location">
+                  🎯 Detect my location
+                </button>
+                <span class="location-hint" id="locationHint"></span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label class="input-label">
+                <span class="input-label-icon">🏁</span> Destination
+              </label>
+              <input class="trip-input" id="inputDest" type="text"
+                     placeholder="e.g. Goa, Manali, Kashmir…"/>
+            </div>
+          </div>
+
+          <!-- Transport Mode Selector (NEW) -->
+          <div class="input-group">
+            <label class="input-label">
+              <span class="input-label-icon">🚀</span> How do you want to travel?
+            </label>
+            <div class="transport-selector" id="transportSelector">
+              <label class="transport-option" data-mode="flight">
+                <input type="radio" name="transport" value="flight" checked/>
+                <div class="transport-card">
+                  <div class="transport-icon">✈️</div>
+                  <div class="transport-name">Flight</div>
+                  <div class="transport-desc">Fastest option</div>
+                </div>
+              </label>
+              <label class="transport-option" data-mode="train">
+                <input type="radio" name="transport" value="train"/>
+                <div class="transport-card">
+                  <div class="transport-icon">🚂</div>
+                  <div class="transport-name">Train</div>
+                  <div class="transport-desc">Book via IRCTC</div>
+                </div>
+              </label>
+              <label class="transport-option" data-mode="bus">
+                <input type="radio" name="transport" value="bus"/>
+                <div class="transport-card">
+                  <div class="transport-icon">🚌</div>
+                  <div class="transport-name">Bus</div>
+                  <div class="transport-desc">Book via RedBus</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Booking redirect banner (shown after mode selection for bus/train) -->
+          <div class="booking-redirect-banner" id="bookingBanner" style="display:none">
+            <div class="booking-banner-icon" id="bookingBannerIcon">🚂</div>
+            <div class="booking-banner-text">
+              <div class="booking-banner-title" id="bookingBannerTitle">Book your train on IRCTC</div>
+              <div class="booking-banner-sub" id="bookingBannerSub">We'll include direct booking link in your plan</div>
+            </div>
+            <a class="booking-banner-btn" id="bookingBannerBtn" href="#" target="_blank" rel="noopener">
+              Book Now →
+            </a>
+          </div>
+
+          <!-- Row 2: Dates + Travellers -->
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label">Travel Dates</label>
+              <input class="trip-input" id="inputDates" type="text" placeholder="e.g. 5 days in Dec 2025"/>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Travellers</label>
+              <input class="trip-input" id="inputTravellers" type="text" placeholder="e.g. 2 adults, 1 kid"/>
+            </div>
+          </div>
+
+          <!-- Row 3: Budget + Extra -->
+          <div class="input-row">
+            <div class="input-group">
+              <label class="input-label">Budget (approx.)</label>
+              <input class="trip-input" id="inputBudget" type="text" placeholder="e.g. ₹50,000 per person"/>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Tell us more (optional)</label>
+              <input class="trip-input" id="inputExtra" type="text" placeholder="Interests, dietary needs, occasions…"/>
+            </div>
+          </div>
+
+          <label class="input-label" style="margin-bottom:10px">Trip Vibe</label>
+          <div class="plan-chips" id="vibeChips">
+            <div class="chip" data-vibe="Adventure">🏔️ Adventure</div>
+            <div class="chip" data-vibe="Beach">🏖️ Beach</div>
+            <div class="chip" data-vibe="Cultural">🏛️ Cultural</div>
+            <div class="chip" data-vibe="Romantic">💑 Romantic</div>
+            <div class="chip" data-vibe="Family">👨‍👩‍👧 Family</div>
+            <div class="chip" data-vibe="Budget">💰 Budget</div>
+            <div class="chip" data-vibe="Luxury">✨ Luxury</div>
+            <div class="chip" data-vibe="Solo">🎒 Solo</div>
+          </div>
+
+          <button class="plan-btn" id="planBtn" onclick="planTrip()">✈ GENERATE MY TRIP PLAN</button>
+
+          <div class="progress-wrap" id="progressWrap">
+            <div class="progress-title">PLANNING IN PROGRESS</div>
+            <div class="progress-steps" id="progressSteps"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RESULTS ── -->
+    <section id="results">
+      <div class="results-wrap">
+        <div class="results-header">
+          <div>
+            <div class="results-title" id="resultsTitleText">Your Trip Plan</div>
+            <div class="results-meta" id="resultsMeta"></div>
+          </div>
+          <div class="results-header-actions">
+            <button class="btn-ghost" style="padding:10px 20px;font-size:13px" onclick="resetPlanner()">↺ Plan Another</button>
+          </div>
+        </div>
+
+        <!-- Nearest boarding point & booking link banner -->
+        <div class="nearest-station-bar" id="nearestStationBar" style="display:none">
+          <div class="nearest-station-icon" id="nsIcon">📍</div>
+          <div class="nearest-station-body">
+            <div class="nearest-station-label">Nearest Boarding Point</div>
+            <div class="nearest-station-text" id="nsText"></div>
+          </div>
+          <a class="nearest-station-book-btn" id="nsBookBtn" href="#" target="_blank" rel="noopener" style="display:none">
+            Book →
+          </a>
+        </div>
+
+        <!-- Inline chat for this trip -->
+        <div class="trip-chat-bar" id="tripChatBar">
+          <div class="trip-chat-messages" id="tripChatMessages"></div>
+          <div class="trip-chat-input-row">
+            <input class="trip-chat-input" id="tripChatInput" type="text"
+                   placeholder="Ask a follow-up about this trip…"
+                   onkeydown="if(event.key==='Enter') sendTripChat()"/>
+            <button class="trip-chat-send" onclick="sendTripChat()">↑</button>
+          </div>
+        </div>
+
+        <div class="result-tabs">
+          <button class="tab-btn active" onclick="switchTab('full')">📋 Full Plan</button>
+          <button class="tab-btn" onclick="switchTab('transport')">🚀 Transport</button>
+          <button class="tab-btn" onclick="switchTab('hotels')">🏨 Hotels</button>
+          <button class="tab-btn" onclick="switchTab('activities')">🗺️ Activities</button>
+          <button class="tab-btn" onclick="switchTab('budget')">💰 Budget</button>
+        </div>
+
+        <div id="tab-full" class="tab-panel active">
+          <div class="result-card">
+            <div class="result-card-title" data-icon="✨">Complete Travel Plan</div>
+            <div class="final-plan" id="finalPlanContent"></div>
+            <button class="copy-btn" onclick="copyToClipboard('finalPlanContent')">📋 Copy Plan</button>
+          </div>
+        </div>
+
+        <div id="tab-transport" class="tab-panel">
+          <div class="result-card">
+            <div class="result-card-title" data-icon="🚀">Transport Details</div>
+            <div id="transportContent">
+              <!-- Filled by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-hotels" class="tab-panel">
+          <div class="result-card">
+            <div class="result-card-title" data-icon="🏨">Hotel Recommendations</div>
+            <div class="result-content" id="hotelsContent"></div>
+          </div>
+        </div>
+
+        <div id="tab-activities" class="tab-panel">
+          <div class="result-card">
+            <div class="result-card-title" data-icon="🗺️">Things To Do</div>
+            <div class="result-content" id="activitiesContent"></div>
+          </div>
+        </div>
+
+        <div id="tab-budget" class="tab-panel">
+          <div class="result-card">
+            <div class="result-card-title" data-icon="💰">Budget Breakdown</div>
+            <div class="result-content" id="budgetContent"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── FEATURES ── -->
+    <section class="features" id="features">
+      <div style="text-align:center">
+        <div class="section-eyebrow">Why WanderAI</div>
+        <div class="section-title">Everything in One Place</div>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">📍</div><div class="feature-title">Start-Point Aware</div><div class="feature-desc">Enter your city and we find the nearest station, bus stand, or airport for you.</div></div>
+        <div class="feature-card"><div class="feature-icon">🚂</div><div class="feature-title">IRCTC & RedBus</div><div class="feature-desc">Choose train or bus — get direct IRCTC / RedBus booking links with boarding details.</div></div>
+        <div class="feature-card"><div class="feature-icon">✈️</div><div class="feature-title">Live Flight Data</div><div class="feature-desc">Real-time flight info via Aviationstack — always up to date.</div></div>
+        <div class="feature-card"><div class="feature-icon">🏨</div><div class="feature-title">Smart Hotel Search</div><div class="feature-desc">Tavily web search finds the best-reviewed hotels for your dates.</div></div>
+        <div class="feature-card"><div class="feature-icon">🤖</div><div class="feature-title">8 AI Agents</div><div class="feature-desc">Specialised agents handle start-point, transport, hotels, activities, itinerary, budget & synthesis.</div></div>
+        <div class="feature-card"><div class="feature-icon">💬</div><div class="feature-title">Trip Chat History</div><div class="feature-desc">Revisit past trips and ask follow-up questions about any previous plan.</div></div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+      <div class="footer-logo">WANDER<span>AI</span></div>
+      <div class="footer-note">Powered by LangGraph · Groq · Tavily · Aviationstack</div>
+      <div class="footer-note">Built by Ritik Turkar</div>
+    </footer>
+
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- History detail modal -->
+<div class="history-modal" id="historyModal">
+  <div class="history-modal-inner">
+    <div class="history-modal-header">
+      <div>
+        <div class="history-modal-title" id="modalTitle">Trip Plan</div>
+        <div class="history-modal-meta" id="modalMeta"></div>
+      </div>
+      <button class="history-modal-close" onclick="closeHistoryModal()">✕</button>
+    </div>
+    <div class="history-modal-tabs">
+      <button class="htab-btn active" onclick="switchHistoryTab('plan')">📋 Plan</button>
+      <button class="htab-btn" onclick="switchHistoryTab('transport')">🚀 Transport</button>
+      <button class="htab-btn" onclick="switchHistoryTab('hotels')">🏨 Hotels</button>
+      <button class="htab-btn" onclick="switchHistoryTab('activities')">🗺️ Activities</button>
+      <button class="htab-btn" onclick="switchHistoryTab('budget')">💰 Budget</button>
+      <button class="htab-btn" onclick="switchHistoryTab('chat')">💬 Chat</button>
+    </div>
+    <div class="history-modal-body">
+      <div class="htab-panel active" id="htab-plan">
+        <div class="final-plan" id="modalPlanContent"></div>
+      </div>
+      <div class="htab-panel" id="htab-transport">
+        <div id="modalTransportContent"></div>
+      </div>
+      <div class="htab-panel" id="htab-hotels">
+        <div class="result-content" id="modalHotelsContent"></div>
+      </div>
+      <div class="htab-panel" id="htab-activities">
+        <div class="result-content" id="modalActivitiesContent"></div>
+      </div>
+      <div class="htab-panel" id="htab-budget">
+        <div class="result-content" id="modalBudgetContent"></div>
+      </div>
+      <div class="htab-panel" id="htab-chat">
+        <div class="modal-chat-messages" id="modalChatMessages"></div>
+        <div class="modal-chat-input-row">
+          <input class="trip-chat-input" id="modalChatInput" type="text"
+                 placeholder="Ask anything about this trip…"
+                 onkeydown="if(event.key==='Enter') sendModalChat()"/>
+          <button class="trip-chat-send" onclick="sendModalChat()">↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeHistoryModal()"></div>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
